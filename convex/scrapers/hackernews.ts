@@ -25,7 +25,10 @@ export async function scrapeHackerNewsImpl(
 
   for (const keyword of keywords) {
     try {
-      const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(keyword)}&tags=job&hitsPerPage=20`;
+      // Search stories AND job-type posts. The `tags=job` filter only matches
+      // HN "job" story type, which misses most "Ask HN: Who is hiring?" content.
+      // Searching without a type tag returns all relevant story matches.
+      const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(keyword)}&tags=(job,story)&hitsPerPage=30&numericFilters=created_at_i>${Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000)}`;
       const res = await fetch(url);
       if (!res.ok) {
         console.error(`HN API error for keyword "${keyword}": ${res.status}`);

@@ -4,7 +4,7 @@ import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const generateReplyDraft = action({
   args: {
@@ -17,9 +17,8 @@ export const generateReplyDraft = action({
     variationNum: v.number(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const user = await ctx.runQuery(internal.billing.getUserForAction, {
       userId,

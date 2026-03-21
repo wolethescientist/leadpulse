@@ -101,11 +101,21 @@ export const getRecentRawPosts = internalQuery({
 export const getOnboardedUsers = internalQuery({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    // Include users who completed the tour OR who at minimum finished the setup wizard.
+    // We check both because completeOnboarding (tour end) was historically broken.
+    const byOnboarding = await ctx.db
       .query("users")
       .withIndex("by_onboardingCompleted", (q) =>
         q.eq("onboardingCompleted", true)
       )
       .take(50);
+
+    const all = await ctx.db.query("users").take(100);
+    const wizardOnly = all.filter(
+      (u) => u.wizardCompleted && !u.onboardingCompleted
+    );
+
+    const seen = new Set(byOnboarding.map((u) => u._id));
+    return [...byOnboarding, ...wizardOnly.filter((u) => !seen.has(u._id))];
   },
 });

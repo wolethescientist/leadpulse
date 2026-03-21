@@ -1,13 +1,12 @@
 import { internalQuery, query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const getLeadsForUser = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     const leads = await ctx.db
       .query("leads")
@@ -77,9 +76,8 @@ export const getLeadWithPost = internalQuery({
 export const getLeadStats = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return { total: 0, newToday: 0, avgScore: 0 };
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return { total: 0, newToday: 0, avgScore: 0 };
 
     const leads = await ctx.db
       .query("leads")

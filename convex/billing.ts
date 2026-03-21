@@ -6,7 +6,7 @@ import {
 } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { checkout, customerPortal } from "./dodo";
 
 // ─── Plan → Dodo product ID mapping ──────────────────────────────────────────
@@ -36,9 +36,8 @@ export const getUserForAction = internalQuery({
 export const getSubscriptionStatus = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
 
     const user = await ctx.db.get(userId);
     if (!user) return null;
@@ -60,9 +59,8 @@ export const createCheckoutSession = action({
     returnUrl: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     // Validate returnUrl to prevent open-redirect abuse
     const allowedReturnHost = process.env.CONVEX_SITE_URL;
@@ -115,9 +113,8 @@ export const getCustomerPortalUrl = action({
 export const cancelSubscription = action({
   args: {},
   handler: async (ctx, _args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     const user: { customerId?: string | null } | null = await ctx.runQuery(
       internal.billing.getUserForAction,

@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 const ALL_PLATFORMS = [
   "reddit",
@@ -12,9 +12,8 @@ const ALL_PLATFORMS = [
 export const getSources = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     return await ctx.db
       .query("sources")
@@ -28,9 +27,8 @@ export const toggleSource = mutation({
     sourceId: v.id("sources"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     const source = await ctx.db.get(args.sourceId);
     if (!source || source.userId !== userId) {
@@ -44,9 +42,8 @@ export const toggleSource = mutation({
 export const initDefaultSources = mutation({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     for (const platform of ALL_PLATFORMS) {
       const existing = await ctx.db

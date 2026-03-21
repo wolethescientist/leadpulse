@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 const KEYWORD_LIMITS: Record<string, number> = {
   free: 3,
@@ -14,9 +14,8 @@ export const addKeyword = mutation({
     term: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
@@ -46,9 +45,8 @@ export const addKeyword = mutation({
 export const listKeywords = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
 
     return await ctx.db
       .query("keywords")
@@ -62,9 +60,8 @@ export const deleteKeyword = mutation({
     keywordId: v.id("keywords"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     const keyword = await ctx.db.get(args.keywordId);
     if (!keyword || keyword.userId !== userId) {
@@ -80,9 +77,8 @@ export const toggleKeyword = mutation({
     keywordId: v.id("keywords"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     const keyword = await ctx.db.get(args.keywordId);
     if (!keyword || keyword.userId !== userId) {

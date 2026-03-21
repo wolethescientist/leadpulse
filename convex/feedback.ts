@@ -1,15 +1,14 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const submitNPS = mutation({
   args: {
     score: v.number(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return;
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return;
 
     await ctx.db.patch(userId, {
       npsScore: args.score,
@@ -25,9 +24,8 @@ export const submitTestimonial = mutation({
     isPublic: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return;
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return;
 
     await ctx.db.insert("testimonials", {
       userId,
