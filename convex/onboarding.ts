@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 const PLATFORM_VALIDATOR = v.union(
   v.literal("reddit"),
@@ -16,9 +16,8 @@ export const saveWizardSetup = mutation({
     instantAlerts: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
 
     // Insert keywords (skip duplicates)
     const existing = await ctx.db
@@ -78,9 +77,8 @@ export const saveWizardSetup = mutation({
 export const completeOnboarding = mutation({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return;
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return;
     await ctx.db.patch(userId, { onboardingCompleted: true });
   },
 });
@@ -90,9 +88,8 @@ export const dismissFlag = mutation({
     flagKey: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return;
-    const userId = identity.subject as Id<"users">;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return;
 
     const user = await ctx.db.get(userId);
     if (!user) return;
