@@ -64,9 +64,6 @@ export function ReplyDraftModal({
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const truncatedBody =
-    postBody.length > 200 ? postBody.slice(0, 200) + "…" : postBody;
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"

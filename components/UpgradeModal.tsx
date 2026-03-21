@@ -48,7 +48,7 @@ export function UpgradeModal({
             {featureName} requires Pro
           </h3>
           <p className="text-sm text-[#6b6b7e] mt-1.5">
-            You're on the{" "}
+            You&apos;re on the{" "}
             <span className="text-white font-medium">
               {PLAN_LABELS[currentPlan]}
             </span>{" "}

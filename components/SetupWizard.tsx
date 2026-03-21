@@ -36,7 +36,7 @@ interface SetupWizardProps {
 }
 
 export function SetupWizard({
-  userId,
+  userId: _userId,
   wizardCompleted,
   plan,
 }: SetupWizardProps) {

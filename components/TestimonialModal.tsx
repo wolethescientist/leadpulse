@@ -10,7 +10,7 @@ interface TestimonialModalProps {
   onClose: () => void;
 }
 
-export function TestimonialModal({ userId, onClose }: TestimonialModalProps) {
+export function TestimonialModal({ userId: _userId, onClose }: TestimonialModalProps) {
   const [niche, setNiche] = useState("");
   const [resultText, setResultText] = useState("");
   const [isPublic, setIsPublic] = useState(false);

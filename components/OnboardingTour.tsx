@@ -12,7 +12,7 @@ interface OnboardingTourProps {
 }
 
 export function OnboardingTour({
-  userId,
+  userId: _userId,
   onboardingCompleted,
 }: OnboardingTourProps) {
   const started = useRef(false);
