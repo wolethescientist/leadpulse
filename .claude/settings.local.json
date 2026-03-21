@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(curl -s \"https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy\")",
+      "WebFetch(domain:support.reddithelp.com)"
     ]
   }
 }

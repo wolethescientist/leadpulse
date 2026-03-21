@@ -42,20 +42,8 @@ export const orchestrate = internalAction({
       return [];
     }
 
-    const [redditResult, hnResult, remotiveResult, wwrResult] =
+    const [hnResult, remotiveResult, wwrResult] =
       await Promise.all([
-        // Reddit runs in Node.js runtime — must cross via ctx.runAction
-        ctx
-          .runAction(internal.scrapers.reddit.scrapeReddit, {
-            subreddits: DEFAULT_SUBREDDITS,
-            keywords: activeTerms,
-          })
-          .then((ids: Id<"rawPosts">[]) => ({ newIds: ids, errors: 0 }))
-          .catch((err: unknown) => {
-            console.error("Reddit scraper failed:", err);
-            return { newIds: [] as Id<"rawPosts">[], errors: 1 };
-          }),
-
         // HN, Remotive, WWR share the same V8 runtime — call impl directly
         scrapeHackerNewsImpl(ctx, activeTerms).catch((err: unknown) => {
           console.error("HN scraper failed:", err);
@@ -73,8 +61,10 @@ export const orchestrate = internalAction({
         }),
       ]);
 
+    // Reddit disabled — pending API access approval
+    // ctx.runAction(internal.scrapers.reddit.scrapeReddit, { subreddits: DEFAULT_SUBREDDITS, keywords: activeTerms })
+
     const results: ScraperResult[] = [
-      { source: "reddit", newCount: redditResult.newIds.length, errors: redditResult.errors },
       { source: "hackernews", newCount: hnResult.newIds.length, errors: hnResult.errors },
       { source: "remotive", newCount: remotiveResult.newIds.length, errors: remotiveResult.errors },
       { source: "weworkremotely", newCount: wwrResult.newIds.length, errors: wwrResult.errors },

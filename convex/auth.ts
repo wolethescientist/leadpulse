@@ -3,7 +3,7 @@ import { Password } from "@convex-dev/auth/providers/Password";
 import Google from "@auth/core/providers/google";
 import GitHub from "@auth/core/providers/github";
 
-export const { auth, signIn, signOut, store } = convexAuth({
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [Password, Google, GitHub],
   callbacks: {
     async createOrUpdateUser(ctx, args) {
