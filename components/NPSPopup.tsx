@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { TestimonialModal } from "./TestimonialModal";
-import { Id } from "@/convex/_generated/dataModel";
-
 interface NPSPopupProps {
-  userId: Id<"users">;
   /** Unix ms of user account creation (_creationTime) */
   userCreatedAt: number;
   npsScore: number | undefined;
@@ -15,7 +12,7 @@ interface NPSPopupProps {
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
-export function NPSPopup({ userId, userCreatedAt, npsScore }: NPSPopupProps) {
+export function NPSPopup({ userCreatedAt, npsScore }: NPSPopupProps) {
   const [dismissed, setDismissed] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [improvement, setImprovement] = useState("");
@@ -32,7 +29,6 @@ export function NPSPopup({ userId, userCreatedAt, npsScore }: NPSPopupProps) {
   if (showTestimonial) {
     return (
       <TestimonialModal
-        userId={userId}
         onClose={() => setShowTestimonial(false)}
       />
     );

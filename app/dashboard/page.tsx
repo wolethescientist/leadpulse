@@ -77,10 +77,10 @@ export default function DashboardPage() {
     <>
       {userId && userRecord !== undefined && (
         <>
-          <SetupWizard userId={userId} wizardCompleted={userRecord?.wizardCompleted ?? false} plan={plan} />
-          <OnboardingTour userId={userId} onboardingCompleted={userRecord?.onboardingCompleted ?? false} />
-          <FeatureSpotlight userId={userId} dismissedFlags={userRecord?.dismissedFlags ?? []} />
-          <NPSPopup userId={userId} userCreatedAt={userRecord?._creationTime ?? Date.now()} npsScore={userRecord?.npsScore} />
+          <SetupWizard wizardCompleted={userRecord?.wizardCompleted ?? false} plan={plan} />
+          <OnboardingTour onboardingCompleted={userRecord?.onboardingCompleted ?? false} />
+          <FeatureSpotlight dismissedFlags={userRecord?.dismissedFlags ?? []} />
+          <NPSPopup userCreatedAt={userRecord?._creationTime ?? Date.now()} npsScore={userRecord?.npsScore} />
         </>
       )}
 
@@ -215,7 +215,6 @@ export default function DashboardPage() {
                         <LeadCard
                           key={lead._id}
                           lead={lead}
-                          userId={userId}
                           plan={plan}
                           canDraftReply={canDraftReply}
                           highlight
@@ -236,7 +235,6 @@ export default function DashboardPage() {
                           key={lead._id}
                           id={idx === 0 ? "tour-lead-card" : undefined}
                           lead={lead}
-                          userId={userId}
                           plan={plan}
                           canDraftReply={canDraftReply}
                         />
@@ -266,7 +264,6 @@ function FilterBar({ statusFilter, sourceFilter, sortBy, onStatus, onSource, onS
   return (
     <div className="flex flex-wrap items-center gap-2.5 mb-7">
       <FilterGroup<StatusFilter>
-        label="Status"
         value={statusFilter}
         onChange={onStatus}
         options={[
@@ -278,7 +275,6 @@ function FilterBar({ statusFilter, sourceFilter, sortBy, onStatus, onSource, onS
       />
       <div className="h-3.5 w-px bg-white/[0.08]" />
       <FilterGroup<SourceFilter>
-        label="Source"
         value={sourceFilter}
         onChange={onSource}
         options={[
@@ -291,7 +287,6 @@ function FilterBar({ statusFilter, sourceFilter, sortBy, onStatus, onSource, onS
       />
       <div className="h-3.5 w-px bg-white/[0.08]" />
       <FilterGroup<SortBy>
-        label="Sort"
         value={sortBy}
         onChange={onSort}
         options={[
@@ -308,7 +303,6 @@ function FilterGroup<T extends string>({
   value,
   onChange,
 }: {
-  label: string;
   value: T;
   onChange: (v: T) => void;
   options: { value: T; label: string }[];

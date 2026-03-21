@@ -77,7 +77,7 @@ export default function HomePage() {
                 <span className="shimmer-text">right now.</span>
               </h1>
               <h1 className="mt-2 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.6rem]" style={{ color: '#303048' }}>
-                You're not seeing them.
+                You&apos;re not seeing them.
               </h1>
             </div>
 

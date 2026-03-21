@@ -175,14 +175,13 @@ function SettingsContent() {
           {userId && userRecord !== undefined && (
             <>
               {tab === "keywords" && (
-                <KeywordsTab userId={userId} plan={plan} />
+                <KeywordsTab plan={plan} />
               )}
               {tab === "sources" && (
-                <SourcesTab userId={userId} />
+                <SourcesTab />
               )}
               {tab === "alerts" && (
                 <AlertsTab
-                  userId={userId}
                   plan={plan}
                   instantAlerts={userRecord?.instantAlerts ?? false}
                   timezone={userRecord?.timezone ?? "UTC"}
@@ -191,7 +190,6 @@ function SettingsContent() {
               )}
               {tab === "account" && (
                 <AccountTab
-                  userId={userId}
                   plan={plan}
                   email={userRecord?.email ?? ""}
                 />
@@ -212,13 +210,7 @@ function SettingsContent() {
 
 // ─── Keywords Tab ─────────────────────────────────────────────────────────────
 
-function KeywordsTab({
-  userId,
-  plan,
-}: {
-  userId: Id<"users">;
-  plan: Plan;
-}) {
+function KeywordsTab({ plan }: { plan: Plan }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [loadingPack, setLoadingPack] = useState(false);
@@ -378,7 +370,7 @@ function KeywordsTab({
 
 // ─── Sources Tab ──────────────────────────────────────────────────────────────
 
-function SourcesTab({ userId }: { userId: Id<"users"> }) {
+function SourcesTab() {
   const sources = useQuery(api.sources.getSources, {});
   const toggleSource = useMutation(api.sources.toggleSource);
   const initSources = useMutation(api.sources.initDefaultSources);
@@ -451,13 +443,11 @@ function SourcesTab({ userId }: { userId: Id<"users"> }) {
 // ─── Alerts Tab ───────────────────────────────────────────────────────────────
 
 function AlertsTab({
-  userId,
   plan,
   instantAlerts,
   timezone,
   slackWebhook,
 }: {
-  userId: Id<"users">;
   plan: Plan;
   instantAlerts: boolean;
   timezone: string;
@@ -611,11 +601,9 @@ function AlertsTab({
 // ─── Account Tab ──────────────────────────────────────────────────────────────
 
 function AccountTab({
-  userId,
   plan,
   email,
 }: {
-  userId: Id<"users">;
   plan: Plan;
   email: string;
 }) {

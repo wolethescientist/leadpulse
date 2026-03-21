@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import {
   NICHE_PACKS,
   NICHE_LABELS,
@@ -30,13 +29,11 @@ const PLATFORM_LABELS: Record<Platform, { label: string; description: string }> 
 const TOTAL_STEPS = 5;
 
 interface SetupWizardProps {
-  userId: Id<"users">;
   wizardCompleted: boolean;
   plan: Plan;
 }
 
 export function SetupWizard({
-  userId: _userId,
   wizardCompleted,
   plan,
 }: SetupWizardProps) {

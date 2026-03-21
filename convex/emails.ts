@@ -215,6 +215,7 @@ export const sendDailyDigest = internalAction({
     })) as LeadWithPost[];
 
     if (leads.length === 0) return;
+    if (!user.email) return;
 
     const subject = `Your LeadPulse digest — ${leads.length} new lead${leads.length !== 1 ? "s" : ""} today`;
     const html = buildDigestHtml(leads, `${APP_URL}/dashboard`);
@@ -242,6 +243,7 @@ export const sendInstantAlert = internalAction({
     if (user.plan !== "pro" && user.plan !== "agency") return;
     // User-level toggle
     if (!user.instantAlerts) return;
+    if (!user.email) return;
 
     const lead = (await ctx.runQuery(internal.emails.getLeadWithPost, {
       leadId: args.leadId,

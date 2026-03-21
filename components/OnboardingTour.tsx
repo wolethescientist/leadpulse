@@ -3,16 +3,13 @@
 import { useEffect, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import "driver.js/dist/driver.css";
 
 interface OnboardingTourProps {
-  userId: Id<"users">;
   onboardingCompleted: boolean;
 }
 
 export function OnboardingTour({
-  userId: _userId,
   onboardingCompleted,
 }: OnboardingTourProps) {
   const started = useRef(false);

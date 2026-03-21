@@ -5,7 +5,6 @@ import { useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { getKeywordLimit, getLeadLimit, hasInstantAlerts, hasAIReply, hasSlack, hasTeamSeats, type Plan } from "@/lib/plan-limits";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 const PLANS: {
   id: Plan;
@@ -71,7 +70,6 @@ export default function BillingPage() {
   const createCheckout = useAction(api.billing.createCheckoutSession);
   const [loadingPlan, setLoadingPlan] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const currentPlan: Plan = status?.plan ?? "free";
 

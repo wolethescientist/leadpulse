@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-
 interface TestimonialModalProps {
-  userId: Id<"users">;
   onClose: () => void;
 }
 
-export function TestimonialModal({ userId: _userId, onClose }: TestimonialModalProps) {
+export function TestimonialModal({ onClose }: TestimonialModalProps) {
   const [niche, setNiche] = useState("");
   const [resultText, setResultText] = useState("");
   const [isPublic, setIsPublic] = useState(false);

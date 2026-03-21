@@ -23,7 +23,6 @@ type LeadWithPost = Doc<"leads"> & {
 
 interface LeadCardProps {
   lead: LeadWithPost;
-  userId: Id<"users">;
   plan: Plan;
   canDraftReply: boolean;
   highlight?: boolean;
@@ -80,7 +79,7 @@ function ScoreBadge({ score }: { score: number }) {
   );
 }
 
-export function LeadCard({ lead, userId, plan, canDraftReply, highlight, id }: LeadCardProps) {
+export function LeadCard({ lead, plan, canDraftReply, highlight, id }: LeadCardProps) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [thumbed, setThumbed] = useState<"up" | "down" | null>(
     lead.feedback === "good" ? "up" : lead.feedback === "bad" ? "down" : null

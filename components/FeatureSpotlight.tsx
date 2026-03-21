@@ -3,16 +3,13 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import "driver.js/dist/driver.css";
 
 interface FeatureSpotlightProps {
-  userId: Id<"users">;
   dismissedFlags: string[];
 }
 
 export function FeatureSpotlight({
-  userId,
   dismissedFlags,
 }: FeatureSpotlightProps) {
   const started = useRef<string | null>(null);
