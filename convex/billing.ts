@@ -6,7 +6,6 @@ import {
 } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { checkout, customerPortal } from "./dodo";
 
 // ─── Plan → Dodo product ID mapping ──────────────────────────────────────────
@@ -25,9 +24,12 @@ function productIdForPlan(plan: "solo" | "pro" | "agency"): string {
 // ─── Internal query ───────────────────────────────────────────────────────────
 
 export const getUserForAction = internalQuery({
-  args: { userId: v.id("users") },
+  args: { email: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    return await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .unique();
   },
 });
 
@@ -36,10 +38,13 @@ export const getUserForAction = internalQuery({
 export const getSubscriptionStatus = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
 
-    const user = await ctx.db.get(userId);
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", identity.email))
+      .unique();
     if (!user) return null;
 
     return {
@@ -59,8 +64,8 @@ export const createCheckoutSession = action({
     returnUrl: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
 
     // Validate returnUrl to prevent open-redirect abuse.
     // Set APP_URL in Convex dashboard env vars to your frontend origin (e.g. https://leadpulse-gamma.vercel.app)
@@ -79,7 +84,7 @@ export const createCheckoutSession = action({
     }
 
     const user = await ctx.runQuery(internal.billing.getUserForAction, {
-      userId,
+      email: identity.email ?? "",
     });
     if (!user) throw new Error("User not found");
 
@@ -114,12 +119,12 @@ export const getCustomerPortalUrl = action({
 export const cancelSubscription = action({
   args: {},
   handler: async (ctx, _args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
 
     const user: { customerId?: string | null } | null = await ctx.runQuery(
       internal.billing.getUserForAction,
-      { userId }
+      { email: identity.email ?? "" }
     );
     if (!user?.customerId) throw new Error("No active subscription found");
 

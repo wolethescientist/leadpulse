@@ -1,6 +1,5 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
 
 const PLATFORM_VALIDATOR = v.union(
   v.literal("reddit"),
@@ -16,8 +15,14 @@ export const saveWizardSetup = mutation({
     instantAlerts: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", identity.email))
+      .unique();
+    if (!user) throw new Error("User not found");
+    const userId = user._id;
 
     // Insert keywords (skip duplicates)
     const existing = await ctx.db
@@ -45,7 +50,7 @@ export const saveWizardSetup = mutation({
     ] as const;
 
     for (const platform of allPlatforms) {
-      const existing = await ctx.db
+      const existingSource = await ctx.db
         .query("sources")
         .withIndex("by_user_and_platform", (q) =>
           q.eq("userId", userId).eq("platform", platform)
@@ -54,8 +59,8 @@ export const saveWizardSetup = mutation({
 
       const isActive = args.activePlatforms.includes(platform);
 
-      if (existing) {
-        await ctx.db.patch(existing._id, { isActive });
+      if (existingSource) {
+        await ctx.db.patch(existingSource._id, { isActive });
       } else {
         await ctx.db.insert("sources", {
           userId,
@@ -77,9 +82,14 @@ export const saveWizardSetup = mutation({
 export const completeOnboarding = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return;
-    await ctx.db.patch(userId, { onboardingCompleted: true });
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", identity.email))
+      .unique();
+    if (!user) return;
+    await ctx.db.patch(user._id, { onboardingCompleted: true });
   },
 });
 
@@ -88,13 +98,15 @@ export const dismissFlag = mutation({
     flagKey: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return;
-
-    const user = await ctx.db.get(userId);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", identity.email))
+      .unique();
     if (!user) return;
     if (user.dismissedFlags.includes(args.flagKey)) return;
-    await ctx.db.patch(userId, {
+    await ctx.db.patch(user._id, {
       dismissedFlags: [...user.dismissedFlags, args.flagKey],
     });
   },
