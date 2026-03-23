@@ -7,15 +7,18 @@ import "driver.js/dist/driver.css";
 
 interface OnboardingTourProps {
   onboardingCompleted: boolean;
+  wizardCompleted: boolean;
 }
 
 export function OnboardingTour({
   onboardingCompleted,
+  wizardCompleted,
 }: OnboardingTourProps) {
   const started = useRef(false);
   const completeOnboarding = useMutation(api.onboarding.completeOnboarding);
 
   useEffect(() => {
+    if (!wizardCompleted) return;
     if (onboardingCompleted) return;
     if (started.current) return;
     started.current = true;
@@ -119,7 +122,7 @@ export function OnboardingTour({
       // Small delay so the dashboard has rendered
       setTimeout(() => driverObj.drive(), 800);
     });
-  }, [onboardingCompleted]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onboardingCompleted, wizardCompleted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }
