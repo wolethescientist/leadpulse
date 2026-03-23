@@ -62,13 +62,14 @@ export const createCheckoutSession = action({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Validate returnUrl to prevent open-redirect abuse
-    const allowedReturnHost = process.env.CONVEX_SITE_URL;
-    if (allowedReturnHost) {
+    // Validate returnUrl to prevent open-redirect abuse.
+    // Set APP_URL in Convex dashboard env vars to your frontend origin (e.g. https://leadpulse-gamma.vercel.app)
+    const appUrl = process.env.APP_URL;
+    if (appUrl) {
       try {
-        const returnHost = new URL(args.returnUrl).origin;
-        const allowedHost = new URL(allowedReturnHost).origin;
-        if (returnHost !== allowedHost) {
+        const returnOrigin = new URL(args.returnUrl).origin;
+        const allowedOrigin = new URL(appUrl).origin;
+        if (returnOrigin !== allowedOrigin) {
           throw new Error("Invalid returnUrl: must be on the same origin as the app");
         }
       } catch (e: unknown) {
