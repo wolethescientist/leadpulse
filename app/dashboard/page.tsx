@@ -78,7 +78,7 @@ export default function DashboardPage() {
       {userId && userRecord !== undefined && (
         <>
           <SetupWizard wizardCompleted={userRecord?.wizardCompleted ?? false} plan={plan} />
-          <OnboardingTour onboardingCompleted={userRecord?.onboardingCompleted ?? false} />
+          <OnboardingTour onboardingCompleted={userRecord?.onboardingCompleted ?? false} wizardCompleted={userRecord?.wizardCompleted ?? false} />
           <FeatureSpotlight dismissedFlags={userRecord?.dismissedFlags ?? []} />
           <NPSPopup userCreatedAt={userRecord?._creationTime ?? Date.now()} npsScore={userRecord?.npsScore} />
         </>
